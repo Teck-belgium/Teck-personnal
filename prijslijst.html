@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Prijslijsten | Teck</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav id="main-nav"></nav>
+
+  <main class="content">
+    <h1>Prijslijsten</h1>
+    <p>Hier vind je een overzicht van onze actuele prijslijsten.</p>
+
+    <section class="price-list">
+      <h2>Producten & Diensten</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Product/Dienst</th>
+            <th>Prijs</th>
+            <th>Beschrijving</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Product A</td>
+            <td>€ 100</td>
+            <td>Korte omschrijving van Product A</td>
+          </tr>
+          <tr>
+            <td>Dienst B</td>
+            <td>€ 250</td>
+            <td>Korte omschrijving van Dienst B</td>
+          </tr>
+          <!-- Voeg hier meer regels toe -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    fetch('nav.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('main-nav').innerHTML = data;
+      });
+  </script>
+</body>
+</html>
