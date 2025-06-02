@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login | Teck</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Login bij Teck</h2>
+    <form onsubmit="handleLogin(event)">
+      <label>Gebruikersnaam</label>
+      <input type="text" id="username" required />
+
+      <label>Wachtwoord</label>
+      <input type="password" id="password" required />
+
+      <button type="submit">Inloggen</button>
+    </form>
+  </div>
+
+  <script>
+    function handleLogin(event) {
+      event.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      if (username && password) {
+        sessionStorage.setItem('teckUser', username);
+        window.location.href = 'dashboard.html';
+      } else {
+        alert("Vul alle velden in.");
+      }
+    }
+  </script>
+</body>
+</html>
