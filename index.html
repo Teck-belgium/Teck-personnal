@@ -2,36 +2,17 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <title>Login | Teck</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Welkom bij Teck</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <div class="container">
-    <h2>Login bij Teck</h2>
-    <form onsubmit="handleLogin(event)">
-      <label>Gebruikersnaam</label>
-      <input type="text" id="username" required />
-
-      <label>Wachtwoord</label>
-      <input type="password" id="password" required />
-
-      <button type="submit">Inloggen</button>
-    </form>
+  <div class="hero">
+    <h1>Welkom bij Teck</h1>
+    <p>
+      Teck is jouw digitale platform voor innovatieve luchtvaart- en technologieoplossingen.
+      Beheer je gegevens, volg prestaties en verbind met je team op één centrale plek.
+    </p>
+    <a href="login.html" class="cta-button">Ga naar login</a>
   </div>
-
-  <script>
-    function handleLogin(event) {
-      event.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      if (username && password) {
-        sessionStorage.setItem('teckUser', username);
-        window.location.href = 'dashboard.html';
-      } else {
-        alert("Vul alle velden in.");
-      }
-    }
-  </script>
 </body>
 </html>
