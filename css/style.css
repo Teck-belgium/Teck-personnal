@@ -161,3 +161,31 @@ button:hover {
   width: 20px;
   height: 20px;
 }
+
+/* Prijslijst tabel styling */
+.price-list table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-family: Arial, sans-serif;
+}
+
+.price-list th, 
+.price-list td {
+  border: 1px solid #33517e; /* donkerblauw */
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.price-list thead {
+  background-color: #33517e; /* donkerblauwe achtergrond */
+  color: white;
+}
+
+.price-list tbody tr:nth-child(even) {
+  background-color: #f2f7fc; /* lichtblauwe afwisseling */
+}
+
+.price-list tbody tr:hover {
+  background-color: #dbe9f7; /* licht hover effect */
+}
