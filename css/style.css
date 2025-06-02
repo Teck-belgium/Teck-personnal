@@ -1,4 +1,5 @@
 /* style.css - Teck huisstijl */
+
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
@@ -37,4 +38,39 @@ button {
 
 button:hover {
   background-color: #778DA9;
+}
+
+/* Extra stijlen voor index.html */
+
+.hero {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-button {
+  background-color: #778DA9;
+  font-size: 1.25rem;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  color: white;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #A9BCD0;
 }
