@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <!-- Firebase App (core SDK) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<!-- Firebase Firestore -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
   <meta charset="UTF-8" />
   <title>Todo | Teck</title>
   <link rel="stylesheet" href="css/style.css" />
-  </head>
+  <!-- Firebase App (core SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <!-- Firebase Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
 <body>
   <nav id="main-nav"></nav>
+
   <div class="todo-container">
     <h2>Todo lijst</h2>
     <form id="todoForm">
@@ -25,85 +25,96 @@
   </div>
 
   <script>
+    // Jouw Firebase config hier:
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
+      authDomain: "teck-personnal.firebaseapp.com",
+      projectId: "teck-personnal",
+      storageBucket: "teck-personnal.appspot.com",
+      messagingSenderId: "877076892450",
+      appId: "1:877076892450:web:917be69a1428a8697f737b",
+      measurementId: "G-88TT8R5S00"
+    };
 
- const firebaseConfig = {
-  apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
-  authDomain: "teck-personnal.firebaseapp.com",
-  projectId: "teck-personnal",
-  storageBucket: "teck-personnal.firebasestorage.app",
-  messagingSenderId: "877076892450",
-  appId: "1:877076892450:web:917be69a1428a8697f737b",
-  measurementId: "G-88TT8R5S00"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-// Firestore reference
-const db = firebase.firestore();
+    // Firebase initialisatie
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
     const todoForm = document.getElementById('todoForm');
     const todoInput = document.getElementById('todoInput');
     const todoList = document.getElementById('todoList');
 
-    // Laad todos van sessionStorage
-    let todos = JSON.parse(sessionStorage.getItem('todos') || '[]');
+    // Todos array (voor lokaal bijhouden)
+    let todos = [];
 
-    function saveTodos() {
-      sessionStorage.setItem('todos', JSON.stringify(todos));
-    }
+    // Taken realtime laden van Firestore en tonen
+    function loadTodos() {
+      db.collection('todos').orderBy('createdAt').onSnapshot(snapshot => {
+        todos = [];
+        todoList.innerHTML = '';
+        snapshot.forEach(doc => {
+          const todo = doc.data();
+          todo.id = doc.id;
+          todos.push(todo);
 
-    function renderTodos() {
-      todoList.innerHTML = '';
-      todos.forEach((todo, index) => {
-        const li = document.createElement('li');
-        li.textContent = todo.text;
-        if (todo.completed) li.classList.add('completed');
+          const li = document.createElement('li');
+          li.textContent = todo.text;
+          if (todo.completed) li.classList.add('completed');
 
-        li.onclick = () => {
-          todos[index].completed = !todos[index].completed;
-          saveTodos();
-          renderTodos();
-        };
+          li.onclick = () => toggleCompleted(todo.id, !todo.completed);
 
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = '×';
-        removeBtn.className = 'remove-btn';
-        removeBtn.onclick = (e) => {
-          e.stopPropagation();
-          todos.splice(index, 1);
-          saveTodos();
-          renderTodos();
-        };
+          const removeBtn = document.createElement('button');
+          removeBtn.textContent = '×';
+          removeBtn.className = 'remove-btn';
+          removeBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteTodo(todo.id);
+          };
 
-        li.appendChild(removeBtn);
-        todoList.appendChild(li);
+          li.appendChild(removeBtn);
+          todoList.appendChild(li);
+        });
       });
     }
 
+    // Taken afvinken of weer open zetten
+    function toggleCompleted(id, completed) {
+      db.collection('todos').doc(id).update({ completed });
+    }
+
+    // Taak verwijderen
+    function deleteTodo(id) {
+      db.collection('todos').doc(id).delete();
+    }
+
+    // Nieuwe taak toevoegen aan Firestore
     todoForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const text = todoInput.value.trim();
       if (text) {
-        todos.push({ text, completed: false });
-        saveTodos();
-        renderTodos();
+        db.collection('todos').add({
+          text: text,
+          completed: false,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
         todoInput.value = '';
       }
     });
 
+    // Terug naar dashboard knop
     function goBack() {
       window.location.href = 'dashboard.html';
     }
 
-    renderTodos();
-  </script>
-  <script>
+    // Nav laden
     fetch('nav.html')
       .then(response => response.text())
       .then(data => {
         document.getElementById('main-nav').innerHTML = data;
       });
+
+    // Start met laden van taken
+    loadTodos();
   </script>
 </body>
 </html>
