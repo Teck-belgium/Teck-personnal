@@ -136,3 +136,28 @@ button:hover {
       cursor: pointer;
       font-size: 1.2rem;
     }
+
+#main-nav {
+  background: #1B263B;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.home-button {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.home-button svg {
+  stroke: white;
+  width: 20px;
+  height: 20px;
+}
