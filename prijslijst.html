@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <title>Prijslijsten | Teck</title>
   <link rel="stylesheet" href="css/style.css" />
+  <!-- Firebase App (core SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <!-- Firebase Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <nav id="main-nav"></nav>
@@ -14,6 +18,7 @@
 
     <section class="price-list">
       <h2>Producten & Diensten</h2>
+
       <table>
         <thead>
           <tr>
@@ -22,24 +27,86 @@
             <th>Beschrijving</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Product A</td>
-            <td>€ 100</td>
-            <td>Korte omschrijving van Product A</td>
-          </tr>
-          <tr>
-            <td>Dienst B</td>
-            <td>€ 250</td>
-            <td>Korte omschrijving van Dienst B</td>
-          </tr>
-          <!-- Voeg hier meer regels toe -->
+        <tbody id="productTableBody">
+          <!-- Producten komen hier -->
         </tbody>
       </table>
+    </section>
+
+    <section class="add-product" style="margin-top: 2rem;">
+      <h3>Nieuw product toevoegen</h3>
+      <form id="productForm">
+        <input type="text" id="productNaam" placeholder="Productnaam" required />
+        <input type="text" id="productPrijs" placeholder="Prijs" required />
+        <input type="text" id="productBeschrijving" placeholder="Beschrijving" required />
+        <button type="submit">Toevoegen</button>
+      </form>
     </section>
   </main>
 
   <script>
+    // Firebase configuratie (gebruik jouw eigen config hieronder)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
+      authDomain: "teck-personnal.firebaseapp.com",
+      projectId: "teck-personnal",
+      storageBucket: "teck-personnal.appspot.com",
+      messagingSenderId: "877076892450",
+      appId: "1:877076892450:web:917be69a1428a8697f737b",
+      measurementId: "G-88TT8R5S00"
+    };
+
+    // Firebase initialisatie
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const productForm = document.getElementById('productForm');
+    const tbody = document.getElementById('productTableBody');
+
+    // Producten realtime laden vanuit Firestore
+    function laadProducten() {
+      db.collection('producten').orderBy('naam').onSnapshot(snapshot => {
+        tbody.innerHTML = ''; // leegmaken
+        snapshot.forEach(doc => {
+          const product = doc.data();
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${product.naam}</td>
+            <td>${product.prijs}</td>
+            <td>${product.beschrijving}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
+    // Start met producten laden
+    laadProducten();
+
+    // Product toevoegen via formulier
+    productForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const naam = document.getElementById('productNaam').value.trim();
+      const prijs = document.getElementById('productPrijs').value.trim();
+      const beschrijving = document.getElementById('productBeschrijving').value.trim();
+
+      if (naam && prijs && beschrijving) {
+        // Voeg product toe in Firestore
+        db.collection('producten').add({
+          naam,
+          prijs,
+          beschrijving,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          // Formulier leegmaken
+          productForm.reset();
+        }).catch(error => {
+          alert('Fout bij toevoegen product: ' + error.message);
+        });
+      }
+    });
+
+    // Nav laden
     fetch('nav.html')
       .then(response => response.text())
       .then(data => {
