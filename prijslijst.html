@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Prijslijsten | Teck</title>
   <link rel="stylesheet" href="css/style.css" />
-  <!-- Firebase App (core SDK) -->
+  <!-- Firebase App -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <!-- Firebase Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -18,34 +18,34 @@
 
     <section class="price-list">
       <h2>Producten & Diensten</h2>
-
       <table>
         <thead>
           <tr>
             <th>Product/Dienst</th>
             <th>Prijs</th>
             <th>Beschrijving</th>
+            <th>Actie</th>
           </tr>
         </thead>
         <tbody id="productTableBody">
-          <!-- Producten komen hier -->
+          <!-- Producten worden hier geladen -->
         </tbody>
       </table>
     </section>
 
     <section class="add-product" style="margin-top: 2rem;">
-      <h3>Nieuw product toevoegen</h3>
+      <h3 id="formTitle">Nieuw product toevoegen</h3>
       <form id="productForm">
         <input type="text" id="productNaam" placeholder="Productnaam" required />
         <input type="text" id="productPrijs" placeholder="Prijs" required />
         <input type="text" id="productBeschrijving" placeholder="Beschrijving" required />
-        <button type="submit">Toevoegen</button>
+        <button type="submit">Opslaan</button>
+        <button type="button" id="annuleerBtn" style="display:none;">Annuleren</button>
       </form>
     </section>
   </main>
 
   <script>
-    // Firebase configuratie (gebruik jouw eigen config hieronder)
     const firebaseConfig = {
       apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
       authDomain: "teck-personnal.firebaseapp.com",
@@ -56,17 +56,19 @@
       measurementId: "G-88TT8R5S00"
     };
 
-    // Firebase initialisatie
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
     const productForm = document.getElementById('productForm');
     const tbody = document.getElementById('productTableBody');
+    const formTitle = document.getElementById('formTitle');
+    const annuleerBtn = document.getElementById('annuleerBtn');
 
-    // Producten realtime laden vanuit Firestore
+    let bewerkId = null;
+
     function laadProducten() {
       db.collection('producten').orderBy('naam').onSnapshot(snapshot => {
-        tbody.innerHTML = ''; // leegmaken
+        tbody.innerHTML = '';
         snapshot.forEach(doc => {
           const product = doc.data();
           const tr = document.createElement('tr');
@@ -74,16 +76,18 @@
             <td>${product.naam}</td>
             <td>${product.prijs}</td>
             <td>${product.beschrijving}</td>
+            <td>
+              <button onclick="bewerkProduct('${doc.id}', '${product.naam}', '${product.prijs}', \`${product.beschrijving.replace(/`/g, '\\`')}\`)">✏️</button>
+              <button onclick="verwijderProduct('${doc.id}')">🗑️</button>
+            </td>
           `;
           tbody.appendChild(tr);
         });
       });
     }
 
-    // Start met producten laden
     laadProducten();
 
-    // Product toevoegen via formulier
     productForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const naam = document.getElementById('productNaam').value.trim();
@@ -91,22 +95,56 @@
       const beschrijving = document.getElementById('productBeschrijving').value.trim();
 
       if (naam && prijs && beschrijving) {
-        // Voeg product toe in Firestore
-        db.collection('producten').add({
+        const productData = {
           naam,
           prijs,
           beschrijving,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          // Formulier leegmaken
-          productForm.reset();
-        }).catch(error => {
-          alert('Fout bij toevoegen product: ' + error.message);
-        });
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        if (bewerkId) {
+          db.collection('producten').doc(bewerkId).update(productData).then(() => {
+            resetFormulier();
+          }).catch(error => {
+            alert('Fout bij bijwerken product: ' + error.message);
+          });
+        } else {
+          productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          db.collection('producten').add(productData).then(() => {
+            resetFormulier();
+          }).catch(error => {
+            alert('Fout bij toevoegen product: ' + error.message);
+          });
+        }
       }
     });
 
-    // Nav laden
+    function verwijderProduct(id) {
+      if (confirm('Ben je zeker dat je dit product wilt verwijderen?')) {
+        db.collection('producten').doc(id).delete()
+          .then(() => console.log("Product verwijderd"))
+          .catch(error => alert("Fout bij verwijderen: " + error.message));
+      }
+    }
+
+    function bewerkProduct(id, naam, prijs, beschrijving) {
+      document.getElementById('productNaam').value = naam;
+      document.getElementById('productPrijs').value = prijs;
+      document.getElementById('productBeschrijving').value = beschrijving;
+      bewerkId = id;
+      formTitle.textContent = "Product bewerken";
+      annuleerBtn.style.display = "inline-block";
+    }
+
+    function resetFormulier() {
+      productForm.reset();
+      bewerkId = null;
+      formTitle.textContent = "Nieuw product toevoegen";
+      annuleerBtn.style.display = "none";
+    }
+
+    annuleerBtn.addEventListener('click', resetFormulier);
+
     fetch('nav.html')
       .then(response => response.text())
       .then(data => {
