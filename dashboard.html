@@ -32,15 +32,34 @@
     </div>
 
     <p>Welkom, <span id="userDisplay"></span>!</p>
+    <p id="roleInfo"></p>
     <button onclick="logout()">Uitloggen</button>
   </div>
 
   <script>
-    const user = sessionStorage.getItem('teckUser');
-    if (!user) {
+    // Haal gebruiker op en converteer JSON naar object
+    const userData = sessionStorage.getItem('teckUser');
+    if (!userData) {
       window.location.href = 'login.html';
     } else {
-      document.getElementById('userDisplay').textContent = user;
+      const teckUser = JSON.parse(userData);
+
+      // Toon naam
+      const displayNaam = `${teckUser.voornaam || ''} ${teckUser.achternaam || ''}`.trim();
+      document.getElementById('userDisplay').textContent = displayNaam || teckUser.email;
+
+      // Rollen tonen
+      const rollen = teckUser.rollen?.join(', ') || 'geen rollen';
+      document.getElementById('roleInfo').textContent = `Rollen: ${rollen}`;
+
+      // Toegangscontrole voorbeeld
+      if (teckUser.rollen && teckUser.rollen.includes('admin')) {
+        console.log("Je bent admin 🎯");
+        // eventueel extra knoppen tonen
+      } else {
+        console.log("Je bent geen admin");
+        // je zou hier ook bepaalde elementen kunnen verbergen
+      }
     }
 
     function logout() {
@@ -50,3 +69,4 @@
   </script>
 </body>
 </html>
+
