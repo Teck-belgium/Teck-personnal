@@ -86,18 +86,18 @@
 
     // Laad producten en toon in tabel
     function laadProducten() {
-      db.collection('producten').orderBy('naam').onSnapshot(snapshot => {
+      db.collection('voorraad-producten').orderBy('naam').onSnapshot(snapshot => {
         tbody.innerHTML = '';
         snapshot.forEach(doc => {
           const product = doc.data();
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td>${product.afdeling || ''}</td>
-            <td>${product.categorie || ''}</td>
-            <td>${product.naam}</td>
-            <td>${product.beschrijving}</td>
+            <td>${voorraad-product.afdeling || ''}</td>
+            <td>${voorraad-product.categorie || ''}</td>
+            <td>${voorraad-product.naam}</td>
+            <td>${voorraad-product.beschrijving}</td>
             <td>
-              <button onclick="bewerkProduct('${doc.id}', '${product.afdeling}', '${product.categorie}', '${product.naam}', \`${product.beschrijving.replace(/`/g, '\\`')}\`)">✏️</button>
+              <button onclick="bewerkProduct('${doc.id}', '${voorraad-product.afdeling}', '${voorraad-product.categorie}', '${voorraad-product.naam}', \`${voorraad-product.beschrijving.replace(/`/g, '\\`')}\`)">✏️</button>
               <button onclick="verwijderProduct('${doc.id}')">🗑️</button>
             </td>
           `;
@@ -128,17 +128,17 @@
         };
 
         if (bewerkId) {
-          db.collection('producten').doc(bewerkId).update(productData).then(resetFormulier);
+          db.collection('voorraad-producten').doc(bewerkId).update(productData).then(resetFormulier);
         } else {
           productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-          db.collection('producten').add(productData).then(resetFormulier);
+          db.collection('voorraad-producten').add(productData).then(resetFormulier);
         }
       }
     });
 
     function verwijderProduct(id) {
       if (confirm('Ben je zeker dat je dit product wilt verwijderen?')) {
-        db.collection('producten').doc(id).delete();
+        db.collection('voorraad-producten').doc(id).delete();
       }
     }
 
@@ -211,7 +211,7 @@
     }
 
     // Laad de navigatie (zoals in jouw originele code)
-    fetch('nav.html')
+    fetch('/Teck-personnal/nav.html')
       .then(response => response.text())
       .then(data => {
         document.getElementById('main-nav').innerHTML = data;
