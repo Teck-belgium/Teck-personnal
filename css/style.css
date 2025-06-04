@@ -173,7 +173,7 @@ button:hover {
 
 .price-list th, 
 .price-list td {
-  border: 1px solid #33517e; /* donkerblauw */
+  border: 1px solid white; /* donkerblauw */
   padding: 0.75rem 1rem;
   text-align: left;
 }
