@@ -40,6 +40,7 @@
             <th>Afdeling</th>
             <th>Categorie</th>
             <th>Product</th>
+            <th>Aantal</th>
             <th>Beschrijving</th>
             <th>Actie</th>
           </tr>
@@ -56,6 +57,7 @@
         <input type="text" id="afdeling" placeholder="Afdeling" required />
         <input type="text" id="categorie" placeholder="Categorie" required />
         <input type="text" id="productNaam" placeholder="Productnaam" required />
+        <input type="text" id="aantal" placeholder="Aantal" required />
         <input type="text" id="productBeschrijving" placeholder="Beschrijving" required />
         <button type="submit">Opslaan</button>
         <button type="button" id="annuleerBtn" style="display:none;">Annuleren</button>
@@ -95,9 +97,10 @@
             <td>${product.afdeling || ''}</td>
             <td>${product.categorie || ''}</td>
             <td>${product.naam}</td>
+            <td>${product.aantal}</td>
             <td>${product.beschrijving}</td>
             <td>
-              <button onclick="bewerkProduct('${doc.id}', '${product.afdeling}', '${product.categorie}', '${product.naam}', \`${product.beschrijving.replace(/`/g, '\\`')}\`)">✏️</button>
+              <button onclick="bewerkProduct('${doc.id}', '${product.afdeling}', '${product.categorie}', '${product.naam}', '${product.aantal}', \`${product.beschrijving.replace(/`/g, '\\`')}\`)">✏️</button>
               <button onclick="verwijderProduct('${doc.id}')">🗑️</button>
             </td>
           `;
@@ -116,6 +119,7 @@
       const afdeling = document.getElementById('afdeling').value.trim();
       const categorie = document.getElementById('categorie').value.trim();
       const naam = document.getElementById('productNaam').value.trim();
+      const aantal = document.getElementById('aantal').value.trim();
       const beschrijving = document.getElementById('productBeschrijving').value.trim();
 
       if (afdeling && categorie && naam && beschrijving) {
@@ -124,6 +128,7 @@
           categorie,
           naam,
           beschrijving,
+          aantal,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
@@ -146,6 +151,7 @@
       document.getElementById('afdeling').value = afdeling;
       document.getElementById('categorie').value = categorie;
       document.getElementById('productNaam').value = naam;
+      document.getElementById('aantal').value = aantal;
       document.getElementById('productBeschrijving').value = beschrijving;
       bewerkId = id;
       formTitle.textContent = "Product bewerken";
