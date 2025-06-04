@@ -38,9 +38,11 @@
     <section class="add-product" style="margin-top: 2rem;">
       <h3 id="formTitle">Nieuw product toevoegen</h3>
       <form id="productForm">
+        <input type="text" id="afdeling" placeholder="Afdeling" required />
+        <input type="text" id="categorie" placeholder="Categorie" required />
         <input type="text" id="productNaam" placeholder="Productnaam" required />
-        <input type="text" id="productPrijs" placeholder="Prijs" required />
         <input type="text" id="productBeschrijving" placeholder="Beschrijving" required />
+        <input type="text" id="productPrijs" placeholder="Prijs" required />
         <button type="submit">Opslaan</button>
         <button type="button" id="annuleerBtn" style="display:none;">Annuleren</button>
       </form>
@@ -75,11 +77,13 @@
           const product = doc.data();
           const tr = document.createElement('tr');
           tr.innerHTML = `
+            <td>${product.afdeling || ''}</td>
+            <td>${product.categorie || ''}</td>
             <td>${product.naam}</td>
-            <td>${product.prijs}</td>
             <td>${product.beschrijving}</td>
+            <td>${product.prijs}</td>
             <td>
-              <button onclick="bewerkProduct('${doc.id}', '${product.naam}', '${product.prijs}', \`${product.beschrijving.replace(/`/g, '\\`')}\`)">✏️</button>
+              <button onclick="bewerkProduct('${doc.id}', '${product.afdeling}', '${product.categorie}', '${product.naam}', \`${product.beschrijving.replace(/`/g, '\\`')}\`, '${product.prijs}')">✏️</button>
               <button onclick="verwijderProduct('${doc.id}')">🗑️</button>
             </td>
           `;
@@ -92,47 +96,43 @@
 
     productForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      const afdeling = document.getElementById('afdeling').value.trim();
+      const categorie = document.getElementById('categorie').value.trim();
       const naam = document.getElementById('productNaam').value.trim();
-      const prijs = document.getElementById('productPrijs').value.trim();
       const beschrijving = document.getElementById('productBeschrijving').value.trim();
+      const prijs = document.getElementById('productPrijs').value.trim();
 
-      if (naam && prijs && beschrijving) {
+      if (afdeling && categorie && naam && beschrijving && prijs) {
         const productData = {
+          afdeling,
+          categorie,
           naam,
-          prijs,
           beschrijving,
+          prijs,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
         if (bewerkId) {
-          db.collection('producten').doc(bewerkId).update(productData).then(() => {
-            resetFormulier();
-          }).catch(error => {
-            alert('Fout bij bijwerken product: ' + error.message);
-          });
+          db.collection('producten').doc(bewerkId).update(productData).then(resetFormulier);
         } else {
           productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-          db.collection('producten').add(productData).then(() => {
-            resetFormulier();
-          }).catch(error => {
-            alert('Fout bij toevoegen product: ' + error.message);
-          });
+          db.collection('producten').add(productData).then(resetFormulier);
         }
       }
     });
 
     function verwijderProduct(id) {
       if (confirm('Ben je zeker dat je dit product wilt verwijderen?')) {
-        db.collection('producten').doc(id).delete()
-          .then(() => console.log("Product verwijderd"))
-          .catch(error => alert("Fout bij verwijderen: " + error.message));
+        db.collection('producten').doc(id).delete();
       }
     }
 
-    function bewerkProduct(id, naam, prijs, beschrijving) {
+    function bewerkProduct(id, afdeling, categorie, naam, beschrijving, prijs) {
+      document.getElementById('afdeling').value = afdeling;
+      document.getElementById('categorie').value = categorie;
       document.getElementById('productNaam').value = naam;
-      document.getElementById('productPrijs').value = prijs;
       document.getElementById('productBeschrijving').value = beschrijving;
+      document.getElementById('productPrijs').value = prijs;
       bewerkId = id;
       formTitle.textContent = "Product bewerken";
       annuleerBtn.style.display = "inline-block";
