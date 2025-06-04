@@ -185,6 +185,7 @@ button:hover {
 
 .price-list tbody tr{
   background-color: #3c5a8e; 
+  color: white;
 }
 
 .dashboard-btn {
