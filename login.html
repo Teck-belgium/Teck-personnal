@@ -11,7 +11,7 @@
       font-size: 0.9rem;
     }
   </style>
-  <!-- Firebase SDK -->
+  <!-- Firebase SDK compat (v9 compat versie) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -32,17 +32,17 @@
   </div>
 
   <script>
-    // Firebase config hier invullen
+    // 🔧 Firebase config invullen
     const firebaseConfig = {
       apiKey: "JOUW_API_KEY",
       authDomain: "JOUW_PROJECT.firebaseapp.com",
       projectId: "JOUW_PROJECT_ID",
       storageBucket: "JOUW_PROJECT.appspot.com",
-      messagingSenderId: "JOUW_MESSAGING_SENDER_ID",
+      messagingSenderId: "JOUW_SENDER_ID",
       appId: "JOUW_APP_ID"
     };
 
-    // Firebase initialiseren
+    // 🔥 Firebase initialiseren
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -58,21 +58,30 @@
       const password = document.getElementById('password').value.trim();
 
       try {
-        // Probeer in te loggen met Firebase Auth
+        // ✅ Inloggen
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
-        // Optioneel: gebruikersdata ophalen uit Firestore
+        // ✅ Gebruikersdata ophalen uit Firestore
         const userDoc = await db.collection('users').doc(user.uid).get();
         if (userDoc.exists) {
-          // Bijv. gebruikersnaam ophalen
           const userData = userDoc.data();
-          sessionStorage.setItem('teckUser', userData.name || email);
+          // ➕ Opslaan in sessionStorage
+          sessionStorage.setItem('teckUser', JSON.stringify({
+            uid: user.uid,
+            voornaam: userData.voornaam || "",
+            achternaam: userData.achternaam || "",
+            email: user.email,
+            rollen: userData.rollen || []
+          }));
         } else {
-          sessionStorage.setItem('teckUser', email);
+          sessionStorage.setItem('teckUser', JSON.stringify({
+            uid: user.uid,
+            email: user.email
+          }));
         }
 
-        // Redirect naar dashboard
+        // ✅ Redirect naar dashboard
         window.location.href = 'dashboard.html';
 
       } catch (error) {
