@@ -18,6 +18,25 @@
 
     <section class="price-list">
       <h2>Producten & Diensten</h2>
+
+      <!-- Zoek- en sorteervelden -->
+      <div style="margin-bottom:1rem;">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Zoek product, categorie, afdeling..."
+          style="padding:6px; width:250px;"
+          onkeyup="filterTable()"
+        />
+
+        <select id="sortSelect" onchange="sortTable()" style="padding:6px; margin-left:1rem;">
+          <option value="naam-asc">Naam ↑</option>
+          <option value="naam-desc">Naam ↓</option>
+          <option value="prijs-asc">Prijs ↑</option>
+          <option value="prijs-desc">Prijs ↓</option>
+        </select>
+      </div>
+
       <table>
         <thead>
           <tr>
@@ -70,6 +89,7 @@
 
     let bewerkId = null;
 
+    // Laad producten en toon in tabel
     function laadProducten() {
       db.collection('producten').orderBy('naam').onSnapshot(snapshot => {
         tbody.innerHTML = '';
@@ -89,6 +109,9 @@
           `;
           tbody.appendChild(tr);
         });
+        // Na laden: filter en sorteer toepassen om consistentie te behouden
+        filterTable();
+        sortTable();
       });
     }
 
@@ -147,6 +170,58 @@
 
     annuleerBtn.addEventListener('click', resetFormulier);
 
+    // Zoekfunctie filtert op meerdere kolommen
+    function filterTable() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const rows = tbody.querySelectorAll('tr');
+
+      rows.forEach(row => {
+        const afdeling = row.cells[0].textContent.toLowerCase();
+        const categorie = row.cells[1].textContent.toLowerCase();
+        const naam = row.cells[2].textContent.toLowerCase();
+        const beschrijving = row.cells[3].textContent.toLowerCase();
+        const prijs = row.cells[4].textContent.toLowerCase();
+
+        if (
+          afdeling.includes(input) ||
+          categorie.includes(input) ||
+          naam.includes(input) ||
+          beschrijving.includes(input) ||
+          prijs.includes(input)
+        ) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // Sorteerfunctie voor naam en prijs
+    function sortTable() {
+      const select = document.getElementById('sortSelect');
+      const [key, order] = select.value.split('-');
+      const rowsArray = Array.from(tbody.querySelectorAll('tr'));
+
+      rowsArray.sort((a, b) => {
+        let valA, valB;
+
+        if (key === 'naam') {
+          valA = a.cells[2].textContent.toLowerCase();
+          valB = b.cells[2].textContent.toLowerCase();
+        } else if (key === 'prijs') {
+          valA = parseFloat(a.cells[4].textContent.replace(',', '.')) || 0;
+          valB = parseFloat(b.cells[4].textContent.replace(',', '.')) || 0;
+        }
+
+        if (valA < valB) return order === 'asc' ? -1 : 1;
+        if (valA > valB) return order === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      rowsArray.forEach(row => tbody.appendChild(row));
+    }
+
+    // Laad de navigatie (zoals in jouw originele code)
     fetch('nav.html')
       .then(response => response.text())
       .then(data => {
