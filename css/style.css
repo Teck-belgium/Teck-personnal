@@ -183,12 +183,8 @@ button:hover {
   color: white;
 }
 
-.price-list tbody tr:nth-child(even) {
+.price-list tbody tr{
   background-color: #f2f7fc; /* lichtblauwe afwisseling */
-}
-
-.price-list tbody tr:hover {
-  background-color: #dbe9f7; /* licht hover effect */
 }
 
 .dashboard-btn {
