@@ -92,12 +92,12 @@
           const product = doc.data();
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td>${voorraad-product.afdeling || ''}</td>
-            <td>${voorraad-product.categorie || ''}</td>
-            <td>${voorraad-product.naam}</td>
-            <td>${voorraad-product.beschrijving}</td>
+            <td>${product.afdeling || ''}</td>
+            <td>${product.categorie || ''}</td>
+            <td>${product.naam}</td>
+            <td>${product.beschrijving}</td>
             <td>
-              <button onclick="bewerkProduct('${doc.id}', '${voorraad-product.afdeling}', '${voorraad-product.categorie}', '${voorraad-product.naam}', \`${voorraad-product.beschrijving.replace(/`/g, '\\`')}\`)">✏️</button>
+              <button onclick="bewerkProduct('${doc.id}', '${product.afdeling}', '${product.categorie}', '${product.naam}', \`${product.beschrijving.replace(/`/g, '\\`')}\`)">✏️</button>
               <button onclick="verwijderProduct('${doc.id}')">🗑️</button>
             </td>
           `;
