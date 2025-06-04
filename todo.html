@@ -58,10 +58,18 @@
           todos.push(todo);
 
           const li = document.createElement('li');
-          li.textContent = todo.text;
-          if (todo.completed) li.classList.add('completed');
+          const checkbox = document.createElement('input');
+checkbox.type = 'checkbox';
+checkbox.checked = todo.completed;
+checkbox.onchange = () => toggleCompleted(todo.id, checkbox.checked);
 
-          li.onclick = () => toggleCompleted(todo.id, !todo.completed);
+const span = document.createElement('span');
+span.textContent = todo.text;
+if (todo.completed) span.classList.add('completed');
+
+li.appendChild(checkbox);
+li.appendChild(span);
+
 
           const removeBtn = document.createElement('button');
           removeBtn.textContent = '×';
