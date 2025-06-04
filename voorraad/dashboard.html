@@ -47,7 +47,13 @@
         // je zou hier ook bepaalde elementen kunnen verbergen
       }
     }
-    
+
+    // Laad de navigatie (zoals in jouw originele code)
+    fetch('/Teck-personnal/nav.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('main-nav').innerHTML = data;
+      });
   </script>
 </body>
 </html>
