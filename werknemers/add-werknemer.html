@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Werknemer</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Firebase App -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <!-- Firebase Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <nav id="main-nav"></nav>
+
+  <main class="content">
+    <h1>Werknemer</h1>
+    <p>Voeg hier nieuwe werknemers toe en beheer bestaande.</p>
+
+    <section class="employee-list">
+      <h2>Huidige Werknemers</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Naam</th>
+            <th>Functie</th>
+            <th>Email</th>
+            <th>Actie</th>
+          </tr>
+        </thead>
+        <tbody id="werknemerTableBody">
+          <!-- Werknemers worden hier geladen -->
+        </tbody>
+      </table>
+    </section>
+
+    <section class="add-employee" style="margin-top: 2rem;">
+      <h3 id="werknemerFormTitel">Nieuwe werknemer toevoegen</h3>
+      <form id="werknemerForm">
+        <input type="text" id="werknemerNaam" placeholder="Naam" required />
+        <input type="text" id="werknemerFunctie" placeholder="Functie" required />
+        <input type="email" id="werknemerEmail" placeholder="Email" required />
+        <button type="submit">Opslaan</button>
+        <button type="button" id="annuleerWerknemerBtn" style="display:none;">Annuleren</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
+      authDomain: "teck-personnal.firebaseapp.com",
+      projectId: "teck-personnal",
+      storageBucket: "teck-personnal.appspot.com",
+      messagingSenderId: "877076892450",
+      appId: "1:877076892450:web:917be69a1428a8697f737b",
+      measurementId: "G-88TT8R5S00"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const werknemerForm = document.getElementById('werknemerForm');
+    const werknemerTbody = document.getElementById('werknemerTableBody');
+    const werknemerFormTitel = document.getElementById('werknemerFormTitel');
+    const annuleerBtn = document.getElementById('annuleerWerknemerBtn');
+
+    let bewerkWerknemerId = null;
+
+    function laadWerknemers() {
+      db.collection('werknemers').orderBy('naam').onSnapshot(snapshot => {
+        werknemerTbody.innerHTML = '';
+        snapshot.forEach(doc => {
+          const wn = doc.data();
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${wn.naam}</td>
+            <td>${wn.functie}</td>
+            <td>${wn.email}</td>
+            <td>
+              <button onclick="bewerkWerknemer('${doc.id}', '${wn.naam}', '${wn.functie}', '${wn.email}')">✏️</button>
+              <button onclick="verwijderWerknemer('${doc.id}')">🗑️</button>
+            </td>
+          `;
+          werknemerTbody.appendChild(tr);
+        });
+      });
+    }
+
+    laadWerknemers();
+
+    werknemerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const naam = document.getElementById('werknemerNaam').value.trim();
+      const functie = document.getElementById('werknemerFunctie').value.trim();
+      const email = document.getElementById('werknemerEmail').value.trim();
+
+      if (naam && functie && email) {
+        const data = { naam, functie, email, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+
+        if (bewerkWerknemerId) {
+          db.collection('werknemers').doc(bewerkWerknemerId).update(data).then(resetWerknemerForm);
+        } else {
+          data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          db.collection('werknemers').add(data).then(resetWerknemerForm);
+        }
+      }
+    });
+
+    function verwijderWerknemer(id) {
+      if (confirm('Weet je zeker dat je deze werknemer wilt verwijderen?')) {
+        db.collection('werknemers').doc(id).delete();
+      }
+    }
+
+    function bewerkWerknemer(id, naam, functie, email) {
+      document.getElementById('werknemerNaam').value = naam;
+      document.getElementById('werknemerFunctie').value = functie;
+      document.getElementById('werknemerEmail').value = email;
+      bewerkWerknemerId = id;
+      werknemerFormTitel.textContent = "Werknemer bewerken";
+      annuleerBtn.style.display = "inline-block";
+    }
+
+    function resetWerknemerForm() {
+      werknemerForm.reset();
+      bewerkWerknemerId = null;
+      werknemerFormTitel.textContent = "Nieuwe werknemer toevoegen";
+      annuleerBtn.style.display = "none";
+    }
+
+    annuleerBtn.addEventListener('click', resetWerknemerForm);
+
+    fetch('nav.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('main-nav').innerHTML = data;
+      });
+  </script>
+</body>
+</html>
