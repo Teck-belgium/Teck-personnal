@@ -188,6 +188,11 @@ button:hover {
   color: white;
 }
 
+.price-list tbody td {
+  background-color: #3c5a8e;
+  color: white;
+}
+
 .dashboard-btn {
   display: flex;
   flex-direction: column;
