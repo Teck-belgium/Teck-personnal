@@ -88,7 +88,7 @@
 
     // Laad materialen en toon in tabel
     function laadMaterialen() {
-      db.collection('voorraad-materialen').orderBy('naam').onSnapshot(snapshot => {
+      db.collection('voorraad-materiaal').orderBy('naam').onSnapshot(snapshot => {
         tbody.innerHTML = '';
         snapshot.forEach(doc => {
           const materiaal = doc.data();
