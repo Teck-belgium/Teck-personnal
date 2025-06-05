@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Nieuwe Bestelling | Teck</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Nieuwe Bestelling</h2>
+    <form id="bestellingForm">
+      <label for="klant">Klantnaam:</label>
+      <input type="text" id="klant" required>
+
+      <label for="producten">Producten (komma-gescheiden):</label>
+      <input type="text" id="producten" required>
+
+      <label for="totaal">Totaalbedrag (€):</label>
+      <input type="number" id="totaal" step="0.01" required>
+
+      <label for="btw">BTW (%):</label>
+      <input type="number" id="btw" step="0.01" value="21" required>
+
+      <label for="opmerkingen">Opmerkingen:</label>
+      <textarea id="opmerkingen" rows="4" placeholder="Extra informatie..."></textarea>
+
+      <button type="submit">Bestelling opslaan</button>
+    </form>
+    <p id="status" style="margin-top: 1rem;"></p>
+  </div>
+
+  <script>
+   const firebaseConfig = {
+      apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
+      authDomain: "teck-personnal.firebaseapp.com",
+      projectId: "teck-personnal",
+      storageBucket: "teck-personnal.appspot.com",
+      messagingSenderId: "877076892450",
+      appId: "1:877076892450:web:917be69a1428a8697f737b",
+      measurementId: "G-88TT8R5S00"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const form = document.getElementById('bestellingForm');
+    const status = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const klant = document.getElementById('klant').value.trim();
+      const producten = document.getElementById('producten').value.split(',').map(p => p.trim());
+      const totaal = parseFloat(document.getElementById('totaal').value);
+      const btw = parseFloat(document.getElementById('btw').value);
+      const opmerkingen = document.getElementById('opmerkingen').value.trim();
+
+      try {
+        await db.collection('bestellingen').add({
+          klant,
+          producten,
+          totaal,
+          btw,
+          opmerkingen,
+          datum: new Date().toISOString()
+        });
+
+        form.reset();
+        status.textContent = "✅ Bestelling succesvol opgeslagen!";
+        status.style.color = "lightgreen";
+      } catch (err) {
+        console.error(err);
+        status.textContent = "❌ Fout bij opslaan van bestelling.";
+        status.style.color = "red";
+      }
+    });
+  </script>
+</body>
+</html>
