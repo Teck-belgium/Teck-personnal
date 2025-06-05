@@ -10,7 +10,9 @@
     <h2>Dashboard</h2>
     <p>Welkom, <span id="userDisplay"></span></p>
     <p id="roleInfo"></p>
-    <div style="display:flex; justify-content:center; gap:1rem; margin-bottom: 2rem;">
+  </div>
+
+  <div class="button-grid">
       
       <!-- Todo knop -->
       <a href="todo.html" class="dashboard-btn" title="Todo">
@@ -31,7 +33,6 @@
       <a href="voorraad/dashboard.html" class="dashboard-btn" title="Voorraden">
         <span>Voorraden</span>
       </a>
-    </div>
 
     <!-- financien knop -->
       <a href="financien.html" class="dashboard-btn" title="Financien">
@@ -40,7 +41,7 @@
     </div>
 
 
-    <button onclick="logout()">Uitloggen</button>
+    <button class="logout-btn" onclick="logout()">Uitloggen</button>
   </div>
 
   <script>
