@@ -143,29 +143,38 @@ button:hover {
       font-size: 1.2rem;
     }
 
-#main-nav {
-  background: #1B263B;
-  padding: 0.5rem 1rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+.site-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+  background-color: #003366;
+  border-radius: 12px;
+  flex-wrap: wrap;
 }
 
-.home-button {
+.top-nav ul {
+  display: flex;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.nav-button {
+  padding: 10px 16px;
+  background-color: #1976d2;
   color: white;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 1rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+  cursor: pointer;
 }
 
-.home-button svg {
-  stroke: white;
-  width: 20px;
-  height: 20px;
+.nav-button:hover {
+  background-color: #1565c0;
 }
 
 /* Prijslijst tabel styling */
@@ -198,34 +207,29 @@ button:hover {
   color: white;
 }
 
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+  padding: 40px;
+  max-width: 900px;
+  margin: auto;
+}
+
 .dashboard-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 90px;
-  height: 90px;
-  background-color: #f0f4f8;
-  border-radius: 1rem;
-  color: #33517e;
+  background-color: #003366;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-  box-shadow: 0 2px 6px rgba(51, 81, 126, 0.15);
-  transition: background-color 0.3s, box-shadow 0.3s;
-  margin: 0.5rem;
-  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  color: white;
 }
 
 .dashboard-btn:hover {
-  background-color: #33517e;
-  color: white;
-  box-shadow: 0 4px 12px rgba(51, 81, 126, 0.4);
-}
-
-.dashboard-btn .icon {
-  margin-bottom: 0.3rem;
-  stroke: currentColor; /* kleur van de tekst */
+  background-color: #fcfcfc;
+  transform: scale(1.03);
+  color: #001f3f;
 }
 
 .completed {
