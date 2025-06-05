@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Voorraad Materiaal</title>
+  <link rel="stylesheet" href="/Teck-personnal/css/style.css" />
+  <!-- Firebase App -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <!-- Firebase Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <nav id="main-nav"></nav>
+  
+  <h1>Product Materiaal</h1>
+  
+  <section class="price-list">
+      <h2>Materialen</h2>
+
+      <!-- Zoek- en sorteervelden -->
+      <div style="margin-bottom:1rem;">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Zoek product, categorie, afdeling..."
+          style="padding:6px; width:250px;"
+          onkeyup="filterTable()"
+        />
+
+        <select id="sortSelect" onchange="sortTable()" style="padding:6px; margin-left:1rem;">
+          <option value="naam-asc">Naam ↑</option>
+          <option value="naam-desc">Naam ↓</option>
+          <option value="categorie-desc">categorie ↓</option>
+        </select>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Afdeling</th>
+            <th>Categorie</th>
+            <th>Product</th>
+            <th>Aantal</th>
+            <th>locatie</th>
+            <th>Actie</th>
+          </tr>
+        </thead>
+        <tbody id="productTableBody">
+          <!-- Producten worden hier geladen -->
+        </tbody>
+      </table>
+    </section>
+
+    <section class="add-product" style="margin-top: 2rem;">
+      <h3 id="formTitle">Nieuw materiaal toevoegen</h3>
+      <form id="productForm">
+        <input type="text" id="afdeling" placeholder="Afdeling" required />
+        <input type="text" id="categorie" placeholder="Categorie" required />
+        <input type="text" id="productNaam" placeholder="Productnaam" required />
+        <input type="text" id="aantal" placeholder="Aantal" required />
+        <input type="text" id="productLocatie" placeholder="locatie" required />
+        <button type="submit">Opslaan</button>
+        <button type="button" id="annuleerBtn" style="display:none;">Annuleren</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
+      authDomain: "teck-personnal.firebaseapp.com",
+      projectId: "teck-personnal",
+      storageBucket: "teck-personnal.appspot.com",
+      messagingSenderId: "877076892450",
+      appId: "1:877076892450:web:917be69a1428a8697f737b",
+      measurementId: "G-88TT8R5S00"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const productForm = document.getElementById('productForm');
+    const tbody = document.getElementById('productTableBody');
+    const formTitle = document.getElementById('formTitle');
+    const annuleerBtn = document.getElementById('annuleerBtn');
+
+    let bewerkId = null;
+
+    // Laad producten en toon in tabel
+    function laadProducten() {
+      db.collection('voorraad-materialen').orderBy('naam').onSnapshot(snapshot => {
+        tbody.innerHTML = '';
+        snapshot.forEach(doc => {
+          const materiaal = doc.data();
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${materiaal.afdeling || ''}</td>
+            <td>${materiaal.categorie || ''}</td>
+            <td>${materiaal.naam}</td>
+            <td>${materiaal.aantal}</td>
+            <td>${materiaal.locatie}</td>
+            <td>
+              <button onclick="bewerkMateriaal('${doc.id}', '${materiaal.afdeling}', '${materiaal.categorie}', '${materiaal.naam}', '${materiaal.aantal}', \`${materiaal.locatie.replace(/`/g, '\\`')}\`)">✏️</button>
+              <button onclick="verwijderMateriaal('${doc.id}')">🗑️</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+        // Na laden: filter en sorteer toepassen om consistentie te behouden
+        filterTable();
+        sortTable();
+      });
+    }
+
+    laadMaterialen();
+
+    materiaalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const afdeling = document.getElementById('afdeling').value.trim();
+      const categorie = document.getElementById('categorie').value.trim();
+      const naam = document.getElementById('productNaam').value.trim();
+      const aantal = document.getElementById('aantal').value.trim();
+      const locatie = document.getElementById('locatie').value.trim();
+
+      if (afdeling && categorie && naam && locatie) {
+        const materiaalData = {
+          afdeling,
+          categorie,
+          naam,
+          locatie,
+          aantal,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        if (bewerkId) {
+          db.collection('voorraad-materiaal').doc(bewerkId).update(materiaalData).then(resetFormulier);
+        } else {
+          materiaalData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          db.collection('voorraad-materiaal').add(materiaalData).then(resetFormulier);
+        }
+      }
+    });
+
+    function verwijderMateriaal(id) {
+      if (confirm('Ben je zeker dat je dit materiaal wilt verwijderen?')) {
+        db.collection('voorraad-materiaal').doc(id).delete();
+      }
+    }
+
+    function bewerkMateriaal(id, afdeling, categorie, naam, aantal, beschrijving) {
+      document.getElementById('afdeling').value = afdeling;
+      document.getElementById('categorie').value = categorie;
+      document.getElementById('materiaalNaam').value = naam;
+      document.getElementById('aantal').value = aantal;
+      document.getElementById('locatie').value = locatie;
+      bewerkId = id;
+      formTitle.textContent = "voorraad bewerken";
+      annuleerBtn.style.display = "inline-block";
+    }
+
+    function resetFormulier() {
+      productForm.reset();
+      bewerkId = null;
+      formTitle.textContent = "Nieuw materiaal toevoegen";
+      annuleerBtn.style.display = "none";
+    }
+
+    annuleerBtn.addEventListener('click', resetFormulier);
+
+    // Zoekfunctie filtert op meerdere kolommen
+    function filterTable() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const rows = tbody.querySelectorAll('tr');
+
+      rows.forEach(row => {
+        const afdeling = row.cells[0].textContent.toLowerCase();
+        const categorie = row.cells[1].textContent.toLowerCase();
+        const naam = row.cells[2].textContent.toLowerCase();
+        const locatie = row.cells[3].textContent.toLowerCase();
+
+        if (
+          afdeling.includes(input) ||
+          categorie.includes(input) ||
+          naam.includes(input) ||
+          beschrijving.includes(input)
+        ) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // Sorteerfunctie voor naam en categorie
+    function sortTable() {
+      const select = document.getElementById('sortSelect');
+      const [key, order] = select.value.split('-');
+      const rowsArray = Array.from(tbody.querySelectorAll('tr'));
+
+      rowsArray.sort((a, b) => {
+        let valA, valB;
+
+        if (key === 'naam') {
+          valA = a.cells[2].textContent.toLowerCase();
+          valB = b.cells[2].textContent.toLowerCase();
+        } else if (key === 'categorie') {
+          valA = a.cells[1].textContent.toLowerCase();
+          valB = b.cells[1].textContent.toLowerCase();
+        }
+
+        if (valA < valB) return order === 'asc' ? -1 : 1;
+        if (valA > valB) return order === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      rowsArray.forEach(row => tbody.appendChild(row));
+    }
+
+    // Laad de navigatie (zoals in jouw originele code)
+    fetch('/Teck-personnal/nav.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('main-nav').innerHTML = data;
+      });
+  </script>
+</body>
+</html>
