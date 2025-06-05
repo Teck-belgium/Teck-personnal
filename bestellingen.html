@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Bestellingen | Teck</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="order-page">
+      <h2>Bestellingen</h2>
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th>Bestelling ID</th>
+            <th>Klant</th>
+            <th>Producten</th>
+            <th>Totaal</th>
+            <th>Datum</th>
+          </tr>
+        </thead>
+        <tbody id="orderList">
+          <!-- Bestellingen worden hier geladen met JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const bestellingen = [
+      {
+        id: 'B001',
+        klant: 'Jan Peeters',
+        producten: ['Waterpomp X2', 'Sensorpakket'],
+        totaal: '€189,99',
+        datum: '2025-06-01'
+      },
+      {
+        id: 'B002',
+        klant: 'Lisa Martens',
+        producten: ['Drukmeter', 'Flowmeter Pro'],
+        totaal: '€325,50',
+        datum: '2025-06-03'
+      }
+    ];
+
+    const tbody = document.getElementById('orderList');
+    bestellingen.forEach(b => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${b.id}</td>
+        <td>${b.klant}</td>
+        <td>${b.producten.join(', ')}</td>
+        <td>${b.totaal}</td>
+        <td>${b.datum}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  </script>
+</body>
+</html>
