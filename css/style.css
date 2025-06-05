@@ -236,3 +236,12 @@ button:hover {
   text-decoration: line-through;
   color: #888;
 }
+
+.button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
