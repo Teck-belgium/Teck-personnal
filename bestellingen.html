@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <title>Bestellingen | Teck</title>
   <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 </head>
 <body>
   <div class="container">
@@ -13,7 +15,6 @@
       <table class="order-table">
         <thead>
           <tr>
-            <th>Bestelling ID</th>
             <th>Klant</th>
             <th>Producten</th>
             <th>Totaal</th>
@@ -21,42 +22,46 @@
           </tr>
         </thead>
         <tbody id="orderList">
-          <!-- Bestellingen worden hier geladen met JS -->
+          <!-- Firestore data komt hier -->
         </tbody>
       </table>
     </div>
   </div>
 
   <script>
-    const bestellingen = [
-      {
-        id: 'B001',
-        klant: 'Jan Peeters',
-        producten: ['Waterpomp X2', 'Sensorpakket'],
-        totaal: '€189,99',
-        datum: '2025-06-01'
-      },
-      {
-        id: 'B002',
-        klant: 'Lisa Martens',
-        producten: ['Drukmeter', 'Flowmeter Pro'],
-        totaal: '€325,50',
-        datum: '2025-06-03'
-      }
-    ];
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
+      authDomain: "teck-personnal.firebaseapp.com",
+      projectId: "teck-personnal",
+      storageBucket: "teck-personnal.appspot.com",
+      messagingSenderId: "877076892450",
+      appId: "1:877076892450:web:917be69a1428a8697f737b",
+      measurementId: "G-88TT8R5S00"
+    };
 
-    const tbody = document.getElementById('orderList');
-    bestellingen.forEach(b => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${b.id}</td>
-        <td>${b.klant}</td>
-        <td>${b.producten.join(', ')}</td>
-        <td>${b.totaal}</td>
-        <td>${b.datum}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function laadBestellingen() {
+      const tbody = document.getElementById('orderList');
+      tbody.innerHTML = '';
+
+      const snapshot = await db.collection('bestellingen').orderBy('datum', 'desc').get();
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${data.klant}</td>
+          <td>${(data.producten || []).join(', ')}</td>
+          <td>€${data.totaal.toFixed(2)}</td>
+          <td>${new Date(data.datum).toLocaleDateString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    laadBestellingen();
   </script>
 </body>
 </html>
