@@ -12,7 +12,7 @@
 <body>
   <nav id="main-nav"></nav>
   
-  <h1>Product Materiaal</h1>
+  <h1>Materiaal voorraad</h1>
   
   <section class="price-list">
       <h2>Materialen</h2>
@@ -22,7 +22,7 @@
         <input
           type="text"
           id="searchInput"
-          placeholder="Zoek product, categorie, afdeling..."
+          placeholder="Zoek materiaal, categorie, afdeling..."
           style="padding:6px; width:250px;"
           onkeyup="filterTable()"
         />
@@ -39,26 +39,26 @@
           <tr>
             <th>Afdeling</th>
             <th>Categorie</th>
-            <th>Product</th>
+            <th>Materiaal</th>
             <th>Aantal</th>
             <th>locatie</th>
             <th>Actie</th>
           </tr>
         </thead>
-        <tbody id="productTableBody">
-          <!-- Producten worden hier geladen -->
+        <tbody id="materiaalTableBody">
+          <!-- materialen worden hier geladen -->
         </tbody>
       </table>
     </section>
 
-    <section class="add-product" style="margin-top: 2rem;">
+    <section class="add-materiaal" style="margin-top: 2rem;">
       <h3 id="formTitle">Nieuw materiaal toevoegen</h3>
-      <form id="productForm">
+      <form id="materiaalForm">
         <input type="text" id="afdeling" placeholder="Afdeling" required />
         <input type="text" id="categorie" placeholder="Categorie" required />
-        <input type="text" id="productNaam" placeholder="Productnaam" required />
+        <input type="text" id="materiaalNaam" placeholder="Materiaalnaam" required />
         <input type="text" id="aantal" placeholder="Aantal" required />
-        <input type="text" id="productLocatie" placeholder="locatie" required />
+        <input type="text" id="locatie" placeholder="locatie" required />
         <button type="submit">Opslaan</button>
         <button type="button" id="annuleerBtn" style="display:none;">Annuleren</button>
       </form>
@@ -79,15 +79,15 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const productForm = document.getElementById('productForm');
-    const tbody = document.getElementById('productTableBody');
+    const materiaalForm = document.getElementById('metriaalForm');
+    const tbody = document.getElementById('materiaalTableBody');
     const formTitle = document.getElementById('formTitle');
     const annuleerBtn = document.getElementById('annuleerBtn');
 
     let bewerkId = null;
 
-    // Laad producten en toon in tabel
-    function laadProducten() {
+    // Laad materialen en toon in tabel
+    function laadMaterialen() {
       db.collection('voorraad-materialen').orderBy('naam').onSnapshot(snapshot => {
         tbody.innerHTML = '';
         snapshot.forEach(doc => {
@@ -118,7 +118,7 @@
       e.preventDefault();
       const afdeling = document.getElementById('afdeling').value.trim();
       const categorie = document.getElementById('categorie').value.trim();
-      const naam = document.getElementById('productNaam').value.trim();
+      const naam = document.getElementById('materiaalNaam').value.trim();
       const aantal = document.getElementById('aantal').value.trim();
       const locatie = document.getElementById('locatie').value.trim();
 
@@ -159,7 +159,7 @@
     }
 
     function resetFormulier() {
-      productForm.reset();
+      materiaalForm.reset();
       bewerkId = null;
       formTitle.textContent = "Nieuw materiaal toevoegen";
       annuleerBtn.style.display = "none";
