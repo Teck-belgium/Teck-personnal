@@ -15,10 +15,27 @@
     <button class="logout-btn" onclick="logout()">Uitloggen</button>
     </div>
 
-    <nav class="top-nav">
-      <ul>
-        <li><a href="/Teck-personnal/dashboard.html" class="dashboard-btn" title="Home">Home</li>
-    </nav>
+   <nav class="top-nav">
+  <ul>
+    <li><a href="/Teck-personnal/dashboard.html" class="dashboard-btn" title="Home">Home</a></li>
+
+    <li class="dropdown">
+      <a href="#" class="dashboard-btn" title="Beheer">Beheer</a>
+      <ul class="dropdown-menu">
+        <li><a href="werknemer.html" class="dashboard-btn">Werknemers</a></li>
+        <li class="sub-dropdown">
+          <a href="#" class="dashboard-btn">Afdelingen ▸</a>
+          <ul class="sub-dropdown-menu">
+            <li><a href="afdelingen/dashboard.html" class="dashboard-btn">Overzicht</a></li>
+            <li><a href="afdelingen/toevoegen.html" class="dashboard-btn">Toevoegen</a></li>
+          </ul>
+        </li>
+        <li><a href="voorraad/dashboard.html" class="dashboard-btn">Voorraad</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
   </header>
 
   <div class="button-grid">
