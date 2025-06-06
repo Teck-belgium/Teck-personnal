@@ -339,7 +339,6 @@ button:hover {
 .dropdown-menu {
   display: none;
   position: absolute;
-  background-color: #1B263B;
   min-width: 180px;
   top: 100%;
   left: 0;
@@ -361,13 +360,11 @@ button:hover {
   display: block;
   width: 100%;
   padding: 10px 16px;
-  background-color: transparent;
   text-align: left;
   border-radius: 0;
 }
 
 .dropdown-menu .nav-button:hover {
-  background-color: #415A77;
   color: white;
 }
 
@@ -382,7 +379,6 @@ button:hover {
   top: 0;
   left: 100%;
   min-width: 180px;
-  background-color: #1B263B;
   border-radius: 0.5rem;
   padding: 0.5rem 0;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
