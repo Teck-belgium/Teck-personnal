@@ -161,7 +161,6 @@ button:hover {
   gap: 30px;
   padding: 20px;
   background-color: #003366;
-  border-radius: 12px;
   flex-wrap: wrap;
 }
 
