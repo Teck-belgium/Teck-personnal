@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard | afdelingen</title>
+  <link rel="stylesheet" href="/Teck-personnal/css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Dashboard afdelingen</h2>
+
+      <nav id="main-nav"></nav>
+      
+      <!-- SkyTeck dasboard link/knop -->
+      <a href="skyteck/dashboard.html" class="dashboard-btn" title="SkyTeck">
+        <span>SkyTeck</span>
+      </a>
+
+      <!-- AquaTeck dasboard link/knop -->
+      <a href="aquateck/dashboard.html" class="dashboard-btn" title="AquaTeck">
+        <span>AquaTeck</span>
+      </a>
+
+    <!-- EduTeck dasboard link/knop -->
+      <a href="eduteck/dashboard.html" class="dashboard-btn" title="EduTeck">
+        <span>EduTeck</span>
+      </a>
+    </div>
+
+  <script>
+    // Haal gebruiker op en converteer JSON naar object
+    const userData = sessionStorage.getItem('teckUser');
+    if (!userData) {
+      window.location.href = 'login.html';
+    } else {
+      const teckUser = JSON.parse(userData);
+
+      // Toon naam
+      const displayNaam = `${teckUser.voornaam || ''} ${teckUser.achternaam || ''}`.trim();
+      document.getElementById('userDisplay').textContent = displayNaam || teckUser.email;
+
+      // Rollen tonen
+      const rollen = teckUser.rollen?.join(', ') || 'geen rollen';
+      document.getElementById('roleInfo').textContent = `Rollen: ${rollen}`;
+
+      // Toegangscontrole voorbeeld
+      if (teckUser.rollen && teckUser.rollen.includes('admin')) {
+        console.log("Je bent admin 🎯");
+        // eventueel extra knoppen tonen
+      } else {
+        console.log("Je bent geen admin");
+        // je zou hier ook bepaalde elementen kunnen verbergen
+      }
+    }
+
+    // Laad de navigatie (zoals in jouw originele code)
+    fetch('/Teck-personnal/nav.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('main-nav').innerHTML = data;
+      });
+  </script>
+</body>
+</html>
