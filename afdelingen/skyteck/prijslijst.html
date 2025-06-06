@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Prijslijsten | SkyTeck</title>
+  <link rel="stylesheet" href="/Teck-personnal/css/style.css" />
+  <!-- Firebase App -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <!-- Firebase Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <nav id="main-nav"></nav>
+
+  <main class="content">
+    <h1>Prijslijst SkyTeck</h1>
+    <p>Hier vind je een overzicht van onze actuele prijslijsten.</p>
+
+    <section class="price-list">
+      <h2>Producten & Diensten</h2>
+
+      <!-- Zoek- en sorteervelden -->
+      <div style="margin-bottom:1rem;">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Zoek product, categorie, afdeling..."
+          style="padding:6px; width:250px;"
+          onkeyup="filterTable()"
+        />
+
+        <select id="sortSelect" onchange="sortTable()" style="padding:6px; margin-left:1rem;">
+          <option value="naam-asc">Naam ↑</option>
+          <option value="naam-desc">Naam ↓</option>
+          <option value="prijs-asc">Prijs ↑</option>
+          <option value="prijs-desc">Prijs ↓</option>
+        </select>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Afdeling</th>
+            <th>Categorie</th>
+            <th>Product/Dienst</th>
+            <th>Beschrijving</th>
+            <th>Prijs</th>
+            <th>Actie</th>
+          </tr>
+        </thead>
+        <tbody id="productTableBody">
+          <!-- Producten worden hier geladen -->
+        </tbody>
+      </table>
+    </section>
+
+    <section class="add-product" style="margin-top: 2rem;">
+      <h3 id="formTitle">Nieuw product toevoegen</h3>
+      <form id="productForm">
+        <input type="text" id="afdeling" placeholder="Afdeling" required />
+        <input type="text" id="categorie" placeholder="Categorie" required />
+        <input type="text" id="productNaam" placeholder="Productnaam" required />
+        <input type="text" id="productBeschrijving" placeholder="Beschrijving" required />
+        <input type="text" id="productPrijs" placeholder="Prijs" required />
+        <button type="submit">Opslaan</button>
+        <button type="button" id="annuleerBtn" style="display:none;">Annuleren</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
+      authDomain: "teck-personnal.firebaseapp.com",
+      projectId: "teck-personnal",
+      storageBucket: "teck-personnal.appspot.com",
+      messagingSenderId: "877076892450",
+      appId: "1:877076892450:web:917be69a1428a8697f737b",
+      measurementId: "G-88TT8R5S00"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const productForm = document.getElementById('productForm');
+    const tbody = document.getElementById('productTableBody');
+    const formTitle = document.getElementById('formTitle');
+    const annuleerBtn = document.getElementById('annuleerBtn');
+
+    let bewerkId = null;
+
+    // Laad producten en toon in tabel
+    function laadProducten() {
+      db.collection('producten').orderBy('naam').onSnapshot(snapshot => {
+        tbody.innerHTML = '';
+        snapshot.forEach(doc => {
+          const product = doc.data();
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${product.afdeling || ''}</td>
+            <td>${product.categorie || ''}</td>
+            <td>${product.naam}</td>
+            <td>${product.beschrijving}</td>
+            <td>${product.prijs}</td>
+            <td>
+              <button onclick="bewerkProduct('${doc.id}', '${product.afdeling}', '${product.categorie}', '${product.naam}', \`${product.beschrijving.replace(/`/g, '\\`')}\`, '${product.prijs}')">✏️</button>
+              <button onclick="verwijderProduct('${doc.id}')">🗑️</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+        // Na laden: filter en sorteer toepassen om consistentie te behouden
+        filterTable();
+        sortTable();
+      });
+    }
+
+    laadProducten();
+
+    productForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const afdeling = document.getElementById('afdeling').value.trim();
+      const categorie = document.getElementById('categorie').value.trim();
+      const naam = document.getElementById('productNaam').value.trim();
+      const beschrijving = document.getElementById('productBeschrijving').value.trim();
+      const prijs = document.getElementById('productPrijs').value.trim();
+
+      if (afdeling && categorie && naam && beschrijving && prijs) {
+        const productData = {
+          afdeling,
+          categorie,
+          naam,
+          beschrijving,
+          prijs,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        if (bewerkId) {
+          db.collection('producten').doc(bewerkId).update(productData).then(resetFormulier);
+        } else {
+          productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          db.collection('producten').add(productData).then(resetFormulier);
+        }
+      }
+    });
+
+    function verwijderProduct(id) {
+      if (confirm('Ben je zeker dat je dit product wilt verwijderen?')) {
+        db.collection('producten').doc(id).delete();
+      }
+    }
+
+    function bewerkProduct(id, afdeling, categorie, naam, beschrijving, prijs) {
+      document.getElementById('afdeling').value = afdeling;
+      document.getElementById('categorie').value = categorie;
+      document.getElementById('productNaam').value = naam;
+      document.getElementById('productBeschrijving').value = beschrijving;
+      document.getElementById('productPrijs').value = prijs;
+      bewerkId = id;
+      formTitle.textContent = "Product bewerken";
+      annuleerBtn.style.display = "inline-block";
+    }
+
+    function resetFormulier() {
+      productForm.reset();
+      bewerkId = null;
+      formTitle.textContent = "Nieuw product toevoegen";
+      annuleerBtn.style.display = "none";
+    }
+
+    annuleerBtn.addEventListener('click', resetFormulier);
+
+    // Zoekfunctie filtert op meerdere kolommen
+    function filterTable() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const rows = tbody.querySelectorAll('tr');
+
+      rows.forEach(row => {
+        const afdeling = row.cells[0].textContent.toLowerCase();
+        const categorie = row.cells[1].textContent.toLowerCase();
+        const naam = row.cells[2].textContent.toLowerCase();
+        const beschrijving = row.cells[3].textContent.toLowerCase();
+        const prijs = row.cells[4].textContent.toLowerCase();
+
+        if (
+          afdeling.includes(input) ||
+          categorie.includes(input) ||
+          naam.includes(input) ||
+          beschrijving.includes(input) ||
+          prijs.includes(input)
+        ) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // Sorteerfunctie voor naam en prijs
+    function sortTable() {
+      const select = document.getElementById('sortSelect');
+      const [key, order] = select.value.split('-');
+      const rowsArray = Array.from(tbody.querySelectorAll('tr'));
+
+      rowsArray.sort((a, b) => {
+        let valA, valB;
+
+        if (key === 'naam') {
+          valA = a.cells[2].textContent.toLowerCase();
+          valB = b.cells[2].textContent.toLowerCase();
+        } else if (key === 'prijs') {
+          valA = parseFloat(a.cells[4].textContent.replace(',', '.')) || 0;
+          valB = parseFloat(b.cells[4].textContent.replace(',', '.')) || 0;
+        }
+
+        if (valA < valB) return order === 'asc' ? -1 : 1;
+        if (valA > valB) return order === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      rowsArray.forEach(row => tbody.appendChild(row));
+    }
+
+    // Laad de navigatie (zoals in jouw originele code)
+    fetch('nav.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('main-nav').innerHTML = data;
+      });
+  </script>
+</body>
+</html>
