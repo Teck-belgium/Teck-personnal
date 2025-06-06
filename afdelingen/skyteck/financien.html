@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Financiën Overzicht</title>
+  <link rel="stylesheet" href="/Teck-personnal/css/style.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <nav id="main-nav"></nav>
+
+  <h1>Financiën</h1>
+
+  <section class="financien">
+    <form id="financienForm">
+      <input type="date" id="datum" required />
+      <input type="text" id="beschrijving" placeholder="Beschrijving" required />
+      <input type="number" id="bedrag" placeholder="Bedrag (€)" required step="0.01" />
+      <select id="type" required>
+        <option value="inkomst">Inkomst</option>
+        <option value="uitgave">Uitgave</option>
+      </select>
+      <button type="submit">Toevoegen</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Datum</th>
+          <th>Beschrijving</th>
+          <th>Type</th>
+          <th>Bedrag (€)</th>
+          <th>Actie</th>
+        </tr>
+      </thead>
+      <tbody id="financienTabel"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3"><strong>Totaal</strong></td>
+          <td colspan="2" id="totaalBedrag">€0,00</td>
+        </tr>
+      </tfoot>
+    </table>
+  </section>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
+      authDomain: "teck-personnal.firebaseapp.com",
+      projectId: "teck-personnal",
+      storageBucket: "teck-personnal.appspot.com",
+      messagingSenderId: "877076892450",
+      appId: "1:877076892450:web:917be69a1428a8697f737b",
+      measurementId: "G-88TT8R5S00"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const form = document.getElementById('financienForm');
+    const tabel = document.getElementById('financienTabel');
+    const totaal = document.getElementById('totaalBedrag');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const datum = document.getElementById('datum').value;
+      const beschrijving = document.getElementById('beschrijving').value.trim();
+      const bedrag = parseFloat(document.getElementById('bedrag').value);
+      const type = document.getElementById('type').value;
+
+      if (datum && beschrijving && !isNaN(bedrag)) {
+        db.collection('financien').add({
+          datum,
+          beschrijving,
+          bedrag,
+          type,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => form.reset());
+      }
+    });
+
+    function laadFinancien() {
+      db.collection('financien').orderBy('datum', 'desc').onSnapshot(snapshot => {
+        tabel.innerHTML = '';
+        let totaalBedrag = 0;
+
+        snapshot.forEach(doc => {
+          const f = doc.data();
+          const bedrag = parseFloat(f.bedrag);
+          const type = f.type;
+          const datum = f.datum;
+          const rij = document.createElement('tr');
+
+          if (type === 'inkomst') totaalBedrag += bedrag;
+          if (type === 'uitgave') totaalBedrag -= bedrag;
+
+          rij.innerHTML = `
+            <td>${datum}</td>
+            <td>${f.beschrijving}</td>
+            <td>${type}</td>
+            <td>${bedrag.toFixed(2)}</td>
+            <td><button onclick="verwijderFinancieel('${doc.id}')">🗑️</button></td>
+          `;
+
+          tabel.appendChild(rij);
+        });
+
+        totaal.textContent = `€${totaalBedrag.toFixed(2)}`;
+      });
+    }
+
+    function verwijderFinancieel(id) {
+      if (confirm('Weet je zeker dat je deze transactie wilt verwijderen?')) {
+        db.collection('financien').doc(id).delete();
+      }
+    }
+
+    laadFinancien();
+
+    fetch('/Teck-personnal/nav.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('main-nav').innerHTML = data;
+      });
+  </script>
+</body>
+</html>
