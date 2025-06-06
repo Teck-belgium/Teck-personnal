@@ -205,7 +205,7 @@ button:hover {
 }
 
 .top-nav ul {
-  display: flex;
+  display: block;
   gap: 10px;
   list-style: none;
   padding: 0;
