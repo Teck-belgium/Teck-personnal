@@ -368,11 +368,6 @@ button:hover {
   color: white;
 }
 
-/* Sub-dropdown naar rechts */
-.sub-dropdown {
-  position: relative;
-}
-
 .sub-dropdown-menu {
   display: none;
   position: absolute;
@@ -386,4 +381,8 @@ button:hover {
 
 .sub-dropdown:hover .sub-dropdown-menu {
   display: block;
+}
+
+.dropdown, .sub-dropdown {
+  position: relative; /* essentieel voor absolute submenu's */
 }
