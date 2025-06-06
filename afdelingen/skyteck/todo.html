@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Todo | SkyTeck</title>
+  <link rel="stylesheet" href="/Teck-personnal/css/style.css" />
+  <!-- Firebase App (core SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <!-- Firebase Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <nav id="main-nav"></nav>
+
+  <div class="todo-container">
+    <h2>Todo lijst SkyTeck</h2>
+    <form id="todoForm">
+      <input type="text" id="todoInput" placeholder="Nieuwe taak toevoegen..." required />
+      <button type="submit" class="add-btn">+</button>
+    </form>
+    <ul id="todoList"></ul>
+    <button onclick="goBack()" style="margin-top:1rem; background:#778DA9; color:white; padding:0.5rem 1rem; border:none; border-radius:0.5rem; cursor:pointer;">
+      Terug naar dashboard afdelingen
+    </button>
+  </div>
+
+  <script>
+    // Jouw Firebase config hier:
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
+      authDomain: "teck-personnal.firebaseapp.com",
+      projectId: "teck-personnal",
+      storageBucket: "teck-personnal.appspot.com",
+      messagingSenderId: "877076892450",
+      appId: "1:877076892450:web:917be69a1428a8697f737b",
+      measurementId: "G-88TT8R5S00"
+    };
+
+    // Firebase initialisatie
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const todoForm = document.getElementById('todoForm');
+    const todoInput = document.getElementById('todoInput');
+    const todoList = document.getElementById('todoList');
+
+    // Todos array (voor lokaal bijhouden)
+    let todos = [];
+
+    // Taken realtime laden van Firestore en tonen
+    function loadTodos() {
+      db.collection('todos').orderBy('createdAt').onSnapshot(snapshot => {
+        todos = [];
+        todoList.innerHTML = '';
+        snapshot.forEach(doc => {
+          const todo = doc.data();
+          todo.id = doc.id;
+          todos.push(todo);
+
+          const li = document.createElement('li');
+          const checkbox = document.createElement('input');
+checkbox.type = 'checkbox';
+checkbox.checked = todo.completed;
+checkbox.onchange = () => toggleCompleted(todo.id, checkbox.checked);
+
+const span = document.createElement('span');
+span.textContent = todo.text;
+if (todo.completed) span.classList.add('completed');
+
+li.appendChild(checkbox);
+li.appendChild(span);
+
+
+          const removeBtn = document.createElement('button');
+          removeBtn.textContent = '×';
+          removeBtn.className = 'remove-btn';
+          removeBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteTodo(todo.id);
+          };
+
+          li.appendChild(removeBtn);
+          todoList.appendChild(li);
+        });
+      });
+    }
+
+    // Taken afvinken of weer open zetten
+    function toggleCompleted(id, completed) {
+      db.collection('todos').doc(id).update({ completed });
+    }
+
+    // Taak verwijderen
+    function deleteTodo(id) {
+      db.collection('todos').doc(id).delete();
+    }
+
+    // Nieuwe taak toevoegen aan Firestore
+    todoForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = todoInput.value.trim();
+      if (text) {
+        db.collection('todos').add({
+          text: text,
+          completed: false,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        todoInput.value = '';
+      }
+    });
+
+    // Terug naar dashboard knop
+    function goBack() {
+      window.location.href = 'dashboard.html';
+    }
+
+    // Nav laden
+    fetch('/Teck-personnal/nav.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('main-nav').innerHTML = data;
+      });
+
+    // Start met laden van taken
+    loadTodos();
+  </script>
+</body>
+</html>
