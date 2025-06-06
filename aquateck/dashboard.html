@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard | Teck</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Dashboard</h2>
+    <p>Welkom, <span id="userDisplay"></span></p>
+    <p id="roleInfo"></p>
+  </div>
+
+  <div class="button-grid">
+      
+      <!-- Todo knop -->
+      <a href="todo.html" class="dashboard-btn" title="Todo">
+        <span>Todo</span>
+      </a>
+
+      <!-- Prijslijsten knop -->
+      <a href="prijslijst.html" class="dashboard-btn" title="Prijslijsten">
+        <span>Prijslijsten</span>
+      </a>
+
+    <!-- werknemer beheer knop -->
+      <a href="werknemer.html" class="dashboard-btn" title="Werknemers beheren">
+        <span>Werknemers beheren</span>
+      </a>
+
+    <!-- voorraden knop -->
+      <a href="voorraad/dashboard.html" class="dashboard-btn" title="Voorraden">
+        <span>Voorraden</span>
+      </a>
+
+    <!-- financien knop -->
+      <a href="financien.html" class="dashboard-btn" title="Financien">
+        <span>Financien</span>
+      </a>
+
+    <!-- overzicht bestellingen knop -->
+      <a href="bestellingen.html" class="dashboard-btn" title="Bestellingen">
+        <span>Overzicht Bestellingen</span>
+      </a>
+
+    <!-- bestellingen toevoegen knop -->
+      <a href="bestelling-toevoegen.html" class="dashboard-btn" title="BestellingToevoegen">
+        <span>Bestelling toeveogen</span>
+      </a>
+    </div>
+
+
+    <button class="logout-btn" onclick="logout()">Uitloggen</button>
+  </div>
+
+  <script>
+    // Haal gebruiker op en converteer JSON naar object
+    const userData = sessionStorage.getItem('teckUser');
+    if (!userData) {
+      window.location.href = 'login.html';
+    } else {
+      const teckUser = JSON.parse(userData);
+
+      // Toon naam
+      const displayNaam = `${teckUser.voornaam || ''} ${teckUser.achternaam || ''}`.trim();
+      document.getElementById('userDisplay').textContent = displayNaam || teckUser.email;
+
+      // Rollen tonen
+      const rollen = teckUser.rollen?.join(', ') || 'geen rollen';
+      document.getElementById('roleInfo').textContent = `Rollen: ${rollen}`;
+
+      // Toegangscontrole voorbeeld
+      if (teckUser.rollen && teckUser.rollen.includes('admin')) {
+        console.log("Je bent admin 🎯");
+        // eventueel extra knoppen tonen
+      } else {
+        console.log("Je bent geen admin");
+        // je zou hier ook bepaalde elementen kunnen verbergen
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('teckUser');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
