@@ -2,13 +2,12 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard | Teck</title>
+  <title>Dashboard | EduTeck</title>
   <link rel="stylesheet" href="/Teck-personnal/css/style.css" />
 </head>
 <body>
   <div class="container">
-    <h2>Dashboard</h2>
-    <p>Welkom, <span id="userDisplay"></span></p>
+    <h2>Dashboard EduTeck</h2>
     <p id="roleInfo"></p>
   </div>
 
@@ -49,9 +48,6 @@
         <span>Bestelling toeveogen</span>
       </a>
     </div>
-
-
-    <button class="logout-btn" onclick="logout()">Uitloggen</button>
   </div>
 
   <script>
@@ -78,11 +74,6 @@
         console.log("Je bent geen admin");
         // je zou hier ook bepaalde elementen kunnen verbergen
       }
-    }
-
-    function logout() {
-      sessionStorage.removeItem('teckUser');
-      window.location.href = 'login.html';
     }
   </script>
 </body>
