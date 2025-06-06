@@ -268,6 +268,8 @@ button:hover {
     cursor: pointer;
     transition: background-color 0.3s;
     width: 90px;
+    max-width: 90px; /* voorkomt dat hij breder wordt */
+    height: 40px; /* optioneel: vaste hoogte voor verticale centrering */
     text-align: center;
     vertical-align: middle;
     display: flex;
