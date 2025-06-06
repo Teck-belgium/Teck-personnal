@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Bestellingen | Teck</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="order-page">
+      <h2>Bestellingen</h2>
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th>Klant</th>
+            <th>Producten</th>
+            <th>Totaal</th>
+            <th>Datum</th>
+          </tr>
+        </thead>
+        <tbody id="orderList">
+          <!-- Firestore data komt hier -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM03URLmymAoYM-RG9ke40YIrAvTrOuNY",
+      authDomain: "teck-personnal.firebaseapp.com",
+      projectId: "teck-personnal",
+      storageBucket: "teck-personnal.appspot.com",
+      messagingSenderId: "877076892450",
+      appId: "1:877076892450:web:917be69a1428a8697f737b",
+      measurementId: "G-88TT8R5S00"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function laadBestellingen() {
+      const tbody = document.getElementById('orderList');
+      tbody.innerHTML = '';
+
+      const snapshot = await db.collection('bestellingen').orderBy('datum', 'desc').get();
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${data.klant}</td>
+          <td>${(data.producten || []).join(', ')}</td>
+          <td>€${data.totaal.toFixed(2)}</td>
+          <td>${new Date(data.datum).toLocaleDateString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    laadBestellingen();
+  </script>
+</body>
+</html>
