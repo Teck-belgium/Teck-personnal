@@ -157,12 +157,37 @@ button:hover {
 
 .site-header {
   display: flex;
-  align-items: flex-start;
-  gap: 20px;
+  align-items: center;
+  gap: 30px;
   padding: 20px;
   background-color: #003366;
   border-radius: 12px;
   flex-wrap: wrap;
+}
+
+.logout-btn {
+  margin-left: auto;
+    background-color: #415A77;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 90px;
+    max-width: 90px; /* voorkomt dat hij breder wordt */
+    height: 40px; /* optioneel: vaste hoogte voor verticale centrering */
+    text-align: center;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.logout-btn:hover {
+  background-color: #778DA9;
 }
 
 .top-nav ul {
@@ -256,30 +281,6 @@ button:hover {
   gap: 1rem;
   margin-top: 2rem;
   margin-bottom: 2rem;
-}
-
-.logout-btn {
-    background-color: #415A77;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    width: 90px;
-    max-width: 90px; /* voorkomt dat hij breder wordt */
-    height: 40px; /* optioneel: vaste hoogte voor verticale centrering */
-    text-align: center;
-    vertical-align: middle;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-
-.logout-btn:hover {
-  background-color: #778DA9;
 }
 
 .order-page {
