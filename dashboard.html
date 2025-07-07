@@ -18,22 +18,6 @@
     <p><span id="userDisplay"></span></p>
     <p>           </p>
     <p id="roleInfo"></p>
-    
-   <nav class="top-nav">
-  <ul>
-    <li><a href="/Teck-personnal/dashboard.html" class="dashboard-btn" title="Home">Home</a>
-    <a href="/Teck-personnal/todo.html" class="dashboard-btn" title="Todo">Todo</a>
-    <a href="/Teck-personnal/prijslijst.html" class="dashboard-btn" title="Prijslijst">Prijslijst</a>
-    <a href="/Teck-personnal/werknemer.html" class="dashboard-btn" title="werknemer">Werknemers</a>
-    <a href="/Teck-personnal/voorraad/dashboard.html" class="dashboard-btn" title="voorraden">Voorraden</a>
-    <a href="/Teck-personnal/finacien.html" class="dashboard-btn" title="financien">Finaciën</a>
-    <a href="/Teck-personnal/bestellingen.html" class="dashboard-btn" title="bestellingen">Bestellingen</a>
-    <a href="/Teck-personnal/afdelingen/skyteck/dashboard.html" class="dashboard-btn" title="SkyTeck">SkyTeck</a>
-    <a href="/Teck-personnal/afdelingen/aquateck/dashboard.html" class="dashboard-btn" title="AquaTeck">AquaTeck</a>
-    <a href="/Teck-personnal/afdelingen/eduteck/dashboard.html" class="dashboard-btn" title="EduTeck">EduTeck</a></li>
-   
-  </ul>
-</nav>
 
   </header>
 
@@ -111,6 +95,12 @@
       sessionStorage.removeItem('teckUser');
       window.location.href = 'login.html';
     }
+
+    fetch('nav.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('nav-placeholder').innerHTML = html;
+    });
   </script>
 </body>
 </html>
